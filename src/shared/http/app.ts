@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import AppError from "../errors/AppError";
+import routes from "../routes";
 
 const app = express();
 
@@ -12,6 +13,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+app.use("/api", routes);
 
 app.use(
     (error: any, request: Request, response: Response, next: NextFunction) => {
