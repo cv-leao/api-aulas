@@ -56,6 +56,10 @@ class CreateUserService {
         }
         /**********************************************************************************/
 
+        if(level != "Aluno" && level != "Professor") {
+            throw new AppError("'level' incorreto informado.");
+        }
+
         const hashedPassword = await hash(password, 8);
 
         const user = await prisma.user.create({
