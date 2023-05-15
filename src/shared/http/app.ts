@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import AppError from "../errors/AppError";
 import routes from "../routes";
+import connectToMongoDB from "../../database/db";
 
 const app = express();
 
@@ -11,6 +12,8 @@ const corsOptions = {
     credentials: true, //access-control-allow-credentials:true
     optionSuccessStatus: 200,
 };
+
+connectToMongoDB();
 
 app.use(cors(corsOptions));
 
