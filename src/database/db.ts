@@ -1,8 +1,8 @@
 import mongoose, { ConnectOptions } from "mongoose";
 
-export default function connectToMongoDB(): void {
+export default async function connectToMongoDB(): Promise<void> {
     if(process.env.DATABASE_URL){
-        mongoose.connect(process.env.DATABASE_URL, {
+        await mongoose.connect(process.env.DATABASE_URL, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         } as ConnectOptions);

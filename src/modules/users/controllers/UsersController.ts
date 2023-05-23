@@ -20,6 +20,7 @@ export default class UsersController {
                 response.statusCode = 400;
                 return error;
             });
+
 /*
         if (user.id) {
             const session = new SessionsController();

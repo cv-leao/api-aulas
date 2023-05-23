@@ -21,9 +21,11 @@ model Admin {
 model User {
   id       String  @id @default(auto()) @map("_id") @db.ObjectId
   name     String
-  email    String  @unique
+  email    String
   level    String
   password String
+  active   Boolean @default(false)
+  token    String? @unique
   Admin    Admin[]
 
   @@map("user")

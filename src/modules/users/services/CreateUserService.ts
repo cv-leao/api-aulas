@@ -2,6 +2,7 @@ import AppError from "../../../shared/errors/AppError";
 import { hash } from "bcryptjs";
 import { User } from "@prisma/client";
 import { prisma } from "../../../database/prismaClient";
+import SendEmailForEmailConfirmation from "./SendEmailForEmailConfirmation";
 
 interface IUserToCreate {
     name: string;
@@ -11,7 +12,7 @@ interface IUserToCreate {
     samePasswords: string;
 }
 
-type UserCreated = Omit<User, "password">;
+type UserCreated = Omit<User, "password" | "token">;
 
 class CreateUserService {
     public async execute({
@@ -30,12 +31,13 @@ class CreateUserService {
         /********************************************************************************/
 
         /***Conferindo se o email inserido pelo usuário já está sendo utilizado por outro usuário***/
-        const userResponse = await prisma.user.findUnique({
+        const userResponse = await prisma.user.findFirst({
             select: {
                 email: true,
             },
             where: {
                 email: email,
+                active: true,
             },
         });
 
@@ -68,6 +70,7 @@ class CreateUserService {
                 name: true,
                 level: true,
                 email: true,
+                active: true,
             },
             data: {
                 name,
@@ -75,6 +78,21 @@ class CreateUserService {
                 level,
                 password: hashedPassword,
             },
+        });
+
+        const id = user.id;
+
+        const confirmationEmail = new SendEmailForEmailConfirmation();
+
+        const token = await confirmationEmail.execute({ name, email, id });
+
+        await prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                token: token,
+            }
         });
 
         return user;
