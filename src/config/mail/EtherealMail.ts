@@ -38,8 +38,8 @@ export default class EtherealMail {
             secure: false,
             auth: {
                 type: "login",
-                user: "sjkkjbd@hotmail.com",
-                pass: "A12345678test",
+                user: process.env.HOTMAIL!,
+                pass: process.env.PASSWORD_HOTMAIL!,
             },
         });
 

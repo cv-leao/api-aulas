@@ -80,20 +80,20 @@ class CreateUserService {
             },
         });
 
-        const id = user.id;
+        //const id = user.id;
 
-        const confirmationEmail = new SendEmailForEmailConfirmation();
+        //const confirmationEmail = new SendEmailForEmailConfirmation();
 
-        const token = await confirmationEmail.execute({ name, email, id });
+        //const token = await confirmationEmail.execute({ name, email, id });
 
-        await prisma.user.update({
-            where: {
-                id: id,
-            },
-            data: {
-                token: token,
-            }
-        });
+        // await prisma.user.update({
+        //     where: {
+        //         id: id,
+        //     },
+        //     data: {
+        //         token: token,
+        //     }
+        // });
 
         return user;
     }
