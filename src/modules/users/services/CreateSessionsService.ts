@@ -9,12 +9,10 @@ interface ISessionToCreated {
 }
 
 interface ISessionToReturn {
-    userReturn: {
-        id: string;
-        name: string;
-        email: string;
-        level: boolean;
-    };
+    id: string;
+    name: string;
+    email: string;
+    level: string;
     token: string;
 }
 
@@ -41,13 +39,17 @@ class CreateSessionsService {
         }
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const token = sign({ sub: user.id }, process.env.JWT_SECRET as string, {
+        const token = sign({ sub: user.id }, process.env.JWT_SECRET!, {
             // subject: user.id,
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            expiresIn: process.env.TOKEN_EXPIREIN,
+            expiresIn: process.env.EXPIRATION_SESSION_TOKEN!,
         });
 
-        const userReturn = await prisma.user.findFirst({
+        if(!token) {
+            throw new AppError("Erro ao gerar token.");
+        }
+
+        const userToTransform = await prisma.user.findUnique({
             select: {
                 id: true,
                 name: true,
@@ -55,15 +57,19 @@ class CreateSessionsService {
                 level: true,
             },
             where: {
-                email,
-                active: true,
+                id: user.id,
             },
         });
 
-        return {
-            userReturn,
-            token,
-        } as unknown as ISessionToReturn;
+        const userReturn = {
+            id: userToTransform?.id,
+            name: userToTransform?.name,
+            email: userToTransform?.email,
+            level: userToTransform?.level,
+            token: token
+        };
+
+        return userReturn as ISessionToReturn;
     }
 }
 

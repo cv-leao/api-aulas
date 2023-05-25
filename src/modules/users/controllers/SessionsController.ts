@@ -10,16 +10,15 @@ export default class SessionsController {
 
         const createSession = new CreateSessionsService();
 
-        try {
-            const user = await createSession.execute({
-                email,
-                password,
-            });
+        const user = await createSession.execute({
+            email,
+            password,
+        }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
 
-            return response.json(user);
-        } catch (error: any) {
-            response.statusCode = 401;
-            return response.json(error);
-        }
+        return response.json(user);
+
     }
 }
