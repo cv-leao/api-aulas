@@ -23,7 +23,7 @@ class CreateUserService {
         samePasswords,
     }: IUserToCreate): Promise<UserCreated> {
         /*********Conferindo se o email inserido pelo usuário está "padronizado"*********/
-        const standardizedEmail = /\S+@\S+\.\S+/;
+        const standardizedEmail = /^[a-z-z0-9._%+-]+@[a-za-z0-9.-]+\.[a-za-z]{2,}$/;
 
         if (!standardizedEmail.test(email)) {
             throw new AppError("Endereço de e-mail inválido.");
