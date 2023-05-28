@@ -40,7 +40,14 @@ class CreateClassroomService {
                 }
             },
             include: {
-                administrators: true,
+                administrators: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        level: true,
+                    },
+                }
             },
         });
 
