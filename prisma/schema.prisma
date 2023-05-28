@@ -32,7 +32,7 @@ model Classroom {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   code           String
-  active_room    Boolean
+  active_room    Boolean   @default(true)
   matters        Matters[] @relation(name: "matters")
   participants   User[]    @relation(name: "participants")
   administrators User[]    @relation(name: "administrators")
