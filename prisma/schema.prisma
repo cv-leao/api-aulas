@@ -11,41 +11,35 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  email    String
-  level    String
-  password String
-  active   Boolean @default(false)
-  token    String? @unique
-  Admin    Admin[]
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String
+  level       String
+  password    String
+  active      Boolean    @default(false)
+  token       String?    @unique
+  Classroom   Classroom? @relation(fields: [classroomId], references: [id])
+  classroomId String?    @db.ObjectId
 
   @@map("user")
 }
 
-model Admin {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  User   User   @relation(fields: [userId], references: [id])
-  userId String @db.ObjectId
-
-  @@map("admin")
-}
-
 model Classroom {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  code        String
-  active_room String
-  Matters     Matters[]
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  code         String
+  active_room  String
+  Matters      Matters[]
+  participants User[]
 
   @@map("classroom")
 }
 
 model Matters {
-  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  Classroom   Classroom? @relation(fields: [classroomId], references: [id])
-  classroomId String?    @db.ObjectId
+  Classroom   Classroom @relation(fields: [classroomId], references: [id])
+  classroomId String    @db.ObjectId
 
   @@map("matters")
 }
