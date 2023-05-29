@@ -7,7 +7,7 @@ interface IRequest {
     code: string;
 }
 
-class AddParticipantToClassroom {
+class AddParticipantToClassroomService {
     public async execute({ user_id, code }: IRequest): Promise<Classroom> {
 
         const user = await prisma.user.findUnique({
@@ -130,4 +130,4 @@ class AddParticipantToClassroom {
     }
 }
 
-export default AddParticipantToClassroom;
+export default AddParticipantToClassroomService;
