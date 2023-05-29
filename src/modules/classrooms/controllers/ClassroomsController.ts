@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import CreateClassroomService from "../services/CreateClassroomService";
+import getIdOnToken from "../../../utils/GetIdOnToken";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response) {
-        const { user_id, name } = await request.body;
+        const { token, name } = await request.body;
+
+        const user_id = await getIdOnToken(token);
 
         const createClassroomService = new CreateClassroomService();
 
