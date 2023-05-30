@@ -69,7 +69,7 @@ class AddParticipantToClassroomService {
         const userIsParticipant = classroom.participants.some((participant) =>
         participant.id === user_id);
 
-        if(!userIsAdministrator && !userIsTeacher && !userIsParticipant) {
+        if(userIsAdministrator && userIsTeacher && userIsParticipant) {
             throw new AppError("Você já está nesta sala de aula.");
         }
 
@@ -92,13 +92,11 @@ class AddParticipantToClassroomService {
         };
 
         const AddingParticipantInTheClassroom = await prisma.classroom.update({
-            where: {
-                code: code,
-            },
-            data: {
-                ...userInData,
-            },
-            include: {
+            select: {
+                id: true,
+                name: true,
+                code: true,
+                active_room: true,
                 participants: {
                     select: {
                         id: true,
@@ -123,6 +121,12 @@ class AddParticipantToClassroomService {
                         level: true,
                     },
                 }
+            },
+            where: {
+                code: code,
+            },
+            data: {
+                ...userInData,
             }
         });
 

@@ -11,19 +11,21 @@ datasource db {
 }
 
 model User {
-  id               String     @id @default(auto()) @map("_id") @db.ObjectId
-  name             String
-  email            String
-  level            String
-  password         String
-  active           Boolean    @default(false)
-  token            String?    @unique
-  classroomId      String?    @db.ObjectId
-  participants     Classroom? @relation(name: "participants", fields: [classroomId], references: [id])
-  administrators   Classroom? @relation(name: "administrators", fields: [classroomId], references: [id])
-  teachers         Classroom? @relation(name: "teachers", fields: [classroomId], references: [id])
-  mattersId        String?    @db.ObjectId
-  subject_teachers Matters?   @relation(name: "subject_teachers", fields: [mattersId], references: [id])
+  id                        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name                      String
+  email                     String
+  level                     String
+  password                  String
+  active                    Boolean    @default(false)
+  token                     String?    @unique
+  classroomIdParticipants   String?    @db.ObjectId
+  participants              Classroom? @relation(name: "participants", fields: [classroomIdParticipants], references: [id])
+  classroomIdAdministrators String?    @db.ObjectId
+  administrators            Classroom? @relation(name: "administrators", fields: [classroomIdAdministrators], references: [id])
+  classroomIdTeachers       String?    @db.ObjectId
+  teachers                  Classroom? @relation(name: "teachers", fields: [classroomIdTeachers], references: [id])
+  mattersId                 String?    @db.ObjectId
+  subject_teachers          Matters?   @relation(name: "subject_teachers", fields: [mattersId], references: [id])
 
   @@map("user")
 }
