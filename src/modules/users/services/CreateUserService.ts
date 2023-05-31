@@ -12,7 +12,7 @@ interface IUserToCreate {
     samePasswords: string;
 }
 
-type UserCreated = Omit<User, "password" | "token">;
+type UserCreated = Omit<User, "password" | "token" | "classroomIdParticipants" | "classroomIdTeachers" | "mattersId" | "classroomIdAdministrators">;
 
 class CreateUserService {
     public async execute({
@@ -77,6 +77,7 @@ class CreateUserService {
                 email,
                 level,
                 password: hashedPassword,
+                active: true,
             },
         });
 
