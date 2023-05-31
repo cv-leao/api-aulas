@@ -69,7 +69,7 @@ class AddParticipantToClassroomService {
         const userIsParticipant = classroom.participants.some((participant) =>
         participant.id === user_id);
 
-        if(userIsAdministrator && userIsTeacher && userIsParticipant) {
+        if(userIsAdministrator || userIsTeacher || userIsParticipant) {
             throw new AppError("Você já está nesta sala de aula.");
         }
 
