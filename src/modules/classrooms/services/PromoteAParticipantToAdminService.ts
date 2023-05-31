@@ -81,7 +81,7 @@ class PromoteAParticipantToAdminService {
         const userIsParticipant = classroom.participants.some((participant) =>
         participant.id === user_id);
 
-        if(!userIsParticipant) {
+        if(userIsParticipant) {
             throw new AppError("Participante não encontrado.");
         }
 
