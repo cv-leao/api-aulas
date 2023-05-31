@@ -24,7 +24,7 @@ class CreateClassroomService {
             throw new AppError("Usuário não encontrado.");
         }
 
-        const code = generateClassroomCode();
+        const code = await generateClassroomCode();
 
         if(!code) {
             throw new AppError("Erro ao gerar código da sala.");
