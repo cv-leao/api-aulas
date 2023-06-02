@@ -3,6 +3,7 @@ import CreateClassroomService from "../services/CreateClassroomService";
 import getIdOnToken from "../../../utils/GetIdOnToken";
 import AddParticipantToClassroomService from "../services/AddParticipantToClassroomService";
 import PromoteAParticipantToAdminService from "../services/PromoteAParticipantToAdminService";
+import ShowUserClassroomsService from "../services/ShowUserClassroomsService";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -49,5 +50,20 @@ export default class ClassroomsController {
         });
 
         return response.json(classroom);
+    }
+
+    public async showUserClassrooms(request: Request, response: Response): Promise<Response> {
+        const {  token } = await request.body;
+
+        const user_id = await getIdOnToken(token);
+
+        const showUserClassrooms = new ShowUserClassroomsService();
+
+        const classrooms = await showUserClassrooms.execute({ user_id }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
+
+        return response.json(classrooms);
     }
 }
