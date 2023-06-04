@@ -11,36 +11,48 @@ datasource db {
 }
 
 model User {
-  id                        String     @id @default(auto()) @map("_id") @db.ObjectId
-  name                      String
-  email                     String
-  level                     String
-  password                  String
-  active                    Boolean    @default(false)
-  token                     String?    @unique
-  classroomIdParticipants   String?    @db.ObjectId
-  participants              Classroom? @relation(name: "participants", fields: [classroomIdParticipants], references: [id])
-  classroomIdAdministrators String?    @db.ObjectId
-  administrators            Classroom? @relation(name: "administrators", fields: [classroomIdAdministrators], references: [id])
-  classroomIdTeachers       String?    @db.ObjectId
-  teachers                  Classroom? @relation(name: "teachers", fields: [classroomIdTeachers], references: [id])
-  mattersId                 String?    @db.ObjectId
-  subject_teachers          Matters?   @relation(name: "subject_teachers", fields: [mattersId], references: [id])
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  email            String
+  level            String
+  password         String
+  active           Boolean         @default(false)
+  token            String?         @unique
+  classrooms       ClassroomUser[]
+  mattersId        String?         @db.ObjectId
+  subject_teachers Matters?        @relation(name: "subject_teachers", fields: [mattersId], references: [id])
+  participants     ClassroomUser[] @relation(name: "participants")
+  administrators   ClassroomUser[] @relation(name: "administrators")
+  teachers         ClassroomUser[] @relation(name: "teachers")
 
   @@map("user")
 }
 
 model Classroom {
-  id             String    @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  code           String    @unique
-  active_room    Boolean   @default(true)
-  matters        Matters[] @relation(name: "matters")
-  participants   User[]    @relation(name: "participants")
-  administrators User[]    @relation(name: "administrators")
-  teachers       User[]    @relation(name: "teachers")
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  code          String          @unique
+  active_room   Boolean         @default(true)
+  matters       Matters[]       @relation(name: "matters")
+  ClassroomUser ClassroomUser[]
 
   @@map("classroom")
+}
+
+model ClassroomUser {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  participantId   String?
+  participants    User?      @relation(name: "participants", fields: [participantId], references: [id])
+  administratorId String?
+  administrators  User?      @relation(name: "administrators", fields: [administratorId], references: [id])
+  teacherId       String?
+  teachers        User?      @relation(name: "teachers", fields: [teacherId], references: [id])
+  userId          String?    @db.ObjectId
+  User            User?      @relation(fields: [userId], references: [id])
+  classroomId     String     @db.ObjectId
+  Classroom       Classroom? @relation(fields: [classroomId], references: [id])
+
+  @@map("classroom_user")
 }
 
 model Matters {
