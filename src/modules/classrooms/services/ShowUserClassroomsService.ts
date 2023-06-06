@@ -6,7 +6,7 @@ interface IUserId {
     user_id: string;
 }
 
-type Classrooms = Omit<Classroom, "id" | "code" | "active_room">;
+type Classrooms = Omit<Classroom, "active_room">;
 
 class ShowUserClassroomsService {
     public async execute({ user_id }: IUserId): Promise<Classrooms[]> {
@@ -24,22 +24,31 @@ class ShowUserClassroomsService {
             throw new AppError("Usuário não encontrado.");
         }
 
-        const userLevel = user.level;
+        const classroomsUser = await prisma.classroomUser.findMany({
+            select: {
+                classroomId: true,
+            },
+            where: {
+                userId: user_id,
+            }
+        });
+
+        if(!classroomsUser) {
+            throw new AppError("Nenhuma sala encontrada.");
+        }
+
+        const classroomIds = classroomsUser.map((classroomUser) => classroomUser.classroomId);
 
         const classrooms = await prisma.classroom.findMany({
             select: {
+                id: true,
                 name: true,
+                code: true,
             },
             where: {
-                participants: {
-                    some: { id: user_id },
-                },
-                administrators: {
-                    some: { id: user_id }
-                },
-                teachers: {
-                    some: { id: user_id }
-                },
+              id: {
+                in: classroomIds,
+              },
             },
         });
 
