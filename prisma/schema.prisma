@@ -21,9 +21,9 @@ model User {
   classrooms       ClassroomUser[]
   mattersId        String?         @db.ObjectId
   subject_teachers Matters?        @relation(name: "subject_teachers", fields: [mattersId], references: [id])
-  participants     ClassroomUser[] @relation(name: "participants")
-  administrators   ClassroomUser[] @relation(name: "administrators")
-  teachers         ClassroomUser[] @relation(name: "teachers")
+  participant      ClassroomUser[] @relation(name: "participant")
+  administrator    ClassroomUser[] @relation(name: "administrator")
+  teacher          ClassroomUser[] @relation(name: "teacher")
 
   @@map("user")
 }
@@ -42,15 +42,15 @@ model Classroom {
 model ClassroomUser {
   id              String     @id @default(auto()) @map("_id") @db.ObjectId
   participantId   String?    @db.ObjectId
-  participants    User?      @relation(name: "participants", fields: [participantId], references: [id])
+  participant     User?      @relation(name: "participant", fields: [participantId], references: [id])
   administratorId String?    @db.ObjectId
-  administrators  User?      @relation(name: "administrators", fields: [administratorId], references: [id])
+  administrator   User?      @relation(name: "administrator", fields: [administratorId], references: [id])
   teacherId       String?    @db.ObjectId
-  teachers        User?      @relation(name: "teachers", fields: [teacherId], references: [id])
+  teacher         User?      @relation(name: "teacher", fields: [teacherId], references: [id])
   userId          String?    @db.ObjectId
-  User            User?      @relation(fields: [userId], references: [id])
+  user            User?      @relation(fields: [userId], references: [id])
   classroomId     String     @db.ObjectId
-  Classroom       Classroom? @relation(fields: [classroomId], references: [id])
+  classroom       Classroom? @relation(fields: [classroomId], references: [id])
 
   @@map("classroom_user")
 }
