@@ -1,6 +1,6 @@
-import { Classroom } from "@prisma/client";
 import { prisma } from "../../../database/prismaClient";
 import AppError from "../../../shared/errors/AppError";
+import getClassroomMembers from "../../../utils/GetClassroomMembers";
 
 interface IRequest {
     user_id: string;
@@ -9,37 +9,13 @@ interface IRequest {
 }
 
 class PromoteAParticipantToAdminService {
-    public async execute({ user_id, participant_id, classroom_code }: IRequest): Promise<Classroom> {
+    public async execute({ user_id, participant_id, classroom_code }: IRequest): Promise<any> {
         const classroom = await prisma.classroom.findUnique({
             select: {
                 id: true,
                 name: true,
                 code: true,
                 active_room: true,
-                participants: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                administrators: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                teachers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                }
             },
             where: {
                 code: classroom_code,
@@ -54,90 +30,102 @@ class PromoteAParticipantToAdminService {
             throw new AppError("Sala de aula não encontrada.");
         }
 
-        const userIsAdministratorOrTeacher = classroom.administrators.some(
-            (administrator) => administrator.id === user_id
-          ) || classroom.teachers.some(
-            (teacher) => teacher.id === user_id
-          );
-        
-        if(!userIsAdministratorOrTeacher) {
-            throw new AppError("Usuário não encontrado.");
+        const userInClassroom = await prisma.classroomUser.findFirst({
+            where: {
+                classroom: {
+                    id: classroom.id,
+                },
+                user: {
+                    id: user_id,
+                },
+            },
+        });
+
+        if(!userInClassroom) {
+            throw new AppError("Você não está nesta sala de aula.");
         }
 
-        const participantIsAdministrator = classroom.administrators.some((administrator) =>
-        administrator.id === participant_id);
-
-        if(participantIsAdministrator) {
-            throw new AppError("O participante já é um administrador.");
-        }
-
-        const participantIsTeacher = classroom.teachers.some((teacher) =>
-        teacher.id === participant_id);
-
-        if(participantIsTeacher) {
-            throw new AppError("O usuário selecionado é um professor.");
-        }
-
-        const userIsParticipant = classroom.participants.some((participant) =>
-        participant.id === user_id);
+        const userIsParticipant = await prisma.classroomUser.findFirst({
+            where: {
+                classroom: {
+                    id: classroom.id,
+                },
+                participant: {
+                    id: user_id,
+                },
+            },
+        });
 
         if(userIsParticipant) {
-            throw new AppError("Participante não encontrado.");
+            throw new AppError("Você precisa ser um administrador ou professor para realizar esta função.");
         }
 
-        await prisma.classroom.update({
+        const participantInClassroom = await prisma.classroomUser.findFirst({
             where: {
-                code: classroom_code,
+                classroom: {
+                    id: classroom.id,
+                },
+                participant: {
+                    id: participant_id,
+                },
             },
-            data: {
-                administrators: {
-                    connect: { id: participant_id }
-                }
-            }
         });
 
-        const classroomToreturn = await prisma.classroom.update({
-            select: {
-                id: true,
-                name: true,
-                code: true,
-                active_room: true,
-                participants: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                administrators: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                teachers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                }
-            },
+        if(!participantInClassroom) {
+            throw new AppError("O usuário à ser promovido não foi encontrado.");
+        }
+
+        const participantIsAdministrator = await prisma.classroomUser.findFirst({
             where: {
-                code: classroom_code,
+                classroom: {
+                    id: classroom.id,
+                },
+                administrator: {
+                    id: participant_id,
+                },
             },
-            data: {
-                participants: {
-                    disconnect: { id: participant_id }
-                }
-            }
         });
 
-        return classroomToreturn;
+        if(participantIsAdministrator) {
+            throw new AppError("O usuário já é um administrador.");
+        }
+
+        const participantIsTeacher = await prisma.classroomUser.findFirst({
+            where: {
+                classroom: {
+                    id: classroom.id,
+                },
+                teacher: {
+                    id: participant_id,
+                },
+            },
+        });
+
+        if(participantIsTeacher) {
+            throw new AppError("O usuário é um professor.");
+        }
+
+        await prisma.classroomUser.update({
+            where: {
+                id: participantInClassroom.id,
+            },
+            data: {
+                administrator: {
+                    connect: { id: participant_id },
+                },
+                participant: {
+                    disconnect: true,
+                },
+            },
+        });
+
+        let classroomToReturn = [];
+
+        classroomToReturn.push(classroom);
+        const members = await getClassroomMembers(classroom.id);
+        classroomToReturn.push(members);
+
+        return classroomToReturn;
     }
 }
 
