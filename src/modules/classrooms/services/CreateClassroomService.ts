@@ -36,49 +36,35 @@ class CreateClassroomService {
 
         const userlevel = user.level;
 
+        const classroom = await prisma.classroom.create({
+            data: {
+                name: name,
+                code: code,
+                active_room: true,
+            }
+        });
+
         const userInData = {
-            name: name,
-            code: code,
-            active_room: true,
             ...(userlevel === "Aluno" ? ({
-                administrators: {
+                administrator: {
                     connect: { id: user_id },
                 }
             }) : ({
-                teachers: {
+                teacher: {
                     connect: { id: user_id }
                 }
             }))
         };
 
-        const userInInclude = {
-            ...(userlevel === "Aluno" ? ({
-                administrators: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                }
-            }) : ({
-                teachers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    }
-                }
-            }))
-        }
-
-        const classroom = await prisma.classroom.create({
+        await prisma.classroomUser.create({
             data: {
                 ...userInData,
-            },
-            include: {
-                ...userInInclude,
+                user: {
+                    connect: { id: user_id },
+                },
+                classroom: {
+                    connect: { id: classroom.id },
+                },
             },
         });
 
