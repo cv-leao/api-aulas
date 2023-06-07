@@ -1,14 +1,36 @@
-import { Classroom } from "@prisma/client";
 import { prisma } from "../../../database/prismaClient";
 import AppError from "../../../shared/errors/AppError";
+import getClassroomMembers from "../../../utils/GetClassroomMembers";
 
 interface IRequest {
     user_id: string;
     code: string;
 }
 
+interface IResponse {
+    id: string;
+    name: string;
+    code: string;
+    active_room: string;
+    teachers: {
+        name: string;
+        email: string;
+        level: string;
+    };
+    administrators: {
+        name: string;
+        email: string;
+        level: string;
+    };
+    participants: {
+        name: string;
+        email: string;
+        level: string;
+    };
+}
+
 class AddParticipantToClassroomService {
-    public async execute({ user_id, code }: IRequest): Promise<Classroom> {
+    public async execute({ user_id, code }: IRequest): Promise<any> {
 
         const user = await prisma.user.findUnique({
             where: {
@@ -25,112 +47,73 @@ class AddParticipantToClassroomService {
         }
 
         const classroom = await prisma.classroom.findUnique({
+            select: {
+                id: true,
+                name: true,
+                code: true,
+                active_room: true,
+            },
             where: {
                 code: code,
             },
-            include: {
-                participants: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                administrators: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                teachers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                }
-            }
         });
 
         if (!classroom) {
             throw new AppError("Sala de aula não encontrada.");
         }
 
-        const userIsAdministrator = classroom.administrators.some((administrator) =>
-        administrator.id === user_id);
-
-        const userIsTeacher = classroom.teachers.some((teacher) =>
-        teacher.id === user_id);
-
-        const userIsParticipant = classroom.participants.some((participant) =>
-        participant.id === user_id);
-
-        if(userIsAdministrator || userIsTeacher || userIsParticipant) {
-            throw new AppError("Você já está nesta sala de aula.");
+        if(classroom.active_room === false) {
+            throw new AppError("Sala de aula não encontrada.");
         }
 
-        if(user.level != "Aluno" && user.level != "Professor") {
-            throw new AppError("O level do usuário está incorreto.");
+        const classroomUserMember = await prisma.classroomUser.findFirst({
+            where: {
+                user: {
+                    id: user_id,
+                },
+                classroom: {
+                    id: classroom.id,
+                },
+            }
+        });
+
+        if(classroomUserMember) {
+            throw new AppError("Você já está nessa sala de aula.");
         }
 
         const userlevel = user.level;
 
         const userInData = {
             ...(userlevel === "Aluno" ? ({
-                participants: {
+                participant: {
                     connect: { id: user_id },
-                }
+                },
             }) : ({
-                teachers: {
-                    connect: { id: user_id }
-                }
+                teacher: {
+                    connect: { id: user_id },
+                },
             }))
         };
 
-        const AddingParticipantInTheClassroom = await prisma.classroom.update({
-            select: {
-                id: true,
-                name: true,
-                code: true,
-                active_room: true,
-                participants: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                administrators: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                },
-                teachers: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        level: true,
-                    },
-                }
-            },
-            where: {
-                code: code,
-            },
+        await prisma.classroomUser.create({
             data: {
                 ...userInData,
-            }
+                user: {
+                    connect: { id: user_id },
+                },
+                classroom: {
+                    connect: { id: classroom.id },
+                },
+            },
         });
 
-        return AddingParticipantInTheClassroom;
+        let classroomToReturn = [];
+
+        classroomToReturn.push(classroom);
+        const members = await getClassroomMembers(classroom.id);
+        classroomToReturn.push(members);
+
+        return classroomToReturn;
     }
 }
 
