@@ -4,6 +4,7 @@ import getIdOnToken from "../../../utils/GetIdOnToken";
 import AddParticipantToClassroomService from "../services/AddParticipantToClassroomService";
 import PromoteAParticipantToAdminService from "../services/PromoteAParticipantToAdminService";
 import ShowUserClassroomsService from "../services/ShowUserClassroomsService";
+import GetClassroomMembers from "../services/GetClassroomMembers";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -53,7 +54,7 @@ export default class ClassroomsController {
     }
 
     public async showUserClassrooms(request: Request, response: Response): Promise<Response> {
-        const {  token } = await request.body;
+        const { token } = await request.body;
 
         const user_id = await getIdOnToken(token);
 
@@ -65,5 +66,20 @@ export default class ClassroomsController {
         });
 
         return response.json(classrooms);
+    }
+
+    public async getMembers(request: Request, response: Response): Promise<Response> {
+        const { token, code } = await request.body;
+
+        const user_id = await getIdOnToken(token);
+
+        const getClassroomMembers = new GetClassroomMembers();
+
+        const members = await getClassroomMembers.execute({ user_id, code }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
+
+        return response.json(members);
     }
 }
