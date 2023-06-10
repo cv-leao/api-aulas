@@ -1,6 +1,6 @@
-import { ClassroomUser } from "@prisma/client";
 import { prisma } from "../../../database/prismaClient";
 import AppError from "../../../shared/errors/AppError";
+import getClassroomMembers from "../../../utils/GetClassroomMembers";
 
 interface IRequest {
     user_id: string;
@@ -8,7 +8,7 @@ interface IRequest {
 }
 
 class GetClassroomMembers {
-    public async execute({ user_id, code }: IRequest): Promise<ClassroomUser[]> {
+    public async execute({ user_id, code }: IRequest): Promise<any> {
         const user = await prisma.user.findUnique({
             where: {
                 id: user_id,
@@ -44,13 +44,7 @@ class GetClassroomMembers {
             throw new AppError("Você precisa estar na sala de aula para ver os membros dela.");
         }
 
-        const members = await prisma.classroomUser.findMany({
-            where: {
-                classroom: {
-                    id: classroom.id,
-                },
-            },
-        });
+        const members = await getClassroomMembers(classroom.id);
 
         return members;
     }
