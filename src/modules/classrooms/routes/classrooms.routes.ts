@@ -8,5 +8,6 @@ classroomsRouter.post("/create", classroomsController.create);
 classroomsRouter.patch("/join/:code", classroomsController.addParticipantWithCode);
 classroomsRouter.patch("/promote_to_administrator", classroomsController.promoteAParticipantToAdmin);
 classroomsRouter.get("/show_user_classrooms", classroomsController.showUserClassrooms);
+classroomsRouter.get("/get_members", classroomsController.getMembers);
 
 export default classroomsRouter;
