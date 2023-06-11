@@ -5,6 +5,7 @@ import AddParticipantToClassroomService from "../services/AddParticipantToClassr
 import PromoteAParticipantToAdminService from "../services/PromoteAParticipantToAdminService";
 import ShowUserClassroomsService from "../services/ShowUserClassroomsService";
 import GetClassroomMembers from "../services/GetClassroomMembers";
+import AddMembersByEmail from "../services/AddMembersByEmail";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -36,6 +37,21 @@ export default class ClassroomsController {
         });
 
         return response.json(classroom);
+    }
+
+    public async addParticipantWithEmail(request: Request, response: Response): Promise<Response> {
+        const { token, code, participant_email } = await request.body;
+
+        const user_id = await getIdOnToken(token);
+
+        const addMembersByEmail = new AddMembersByEmail();
+
+        const members = await addMembersByEmail.execute({ user_id, code, participant_email }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
+
+        return response.json(members);
     }
 
     public async promoteAParticipantToAdmin(request: Request, response: Response): Promise<Response> {
