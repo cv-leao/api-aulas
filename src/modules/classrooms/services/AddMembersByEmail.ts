@@ -92,16 +92,16 @@ class AddMembersByEmail {
             throw new AppError("O usuário já está na turma.");
         }
 
-        const userlevel = user.level;
+        const participantLevel = participant.level;
 
         const userInData = {
-            ...(userlevel === "Aluno" ? ({
+            ...(participantLevel === "Aluno" ? ({
                 participant: {
-                    connect: { id: user_id },
+                    connect: { id: participant.id },
                 },
             }) : ({
                 teacher: {
-                    connect: { id: user_id },
+                    connect: { id: participant.id },
                 },
             }))
         };
