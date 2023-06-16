@@ -10,5 +10,6 @@ classroomsRouter.patch("/promote_to_administrator", classroomsController.promote
 classroomsRouter.get("/show_user_classrooms", classroomsController.showUserClassrooms);
 classroomsRouter.get("/get_members", classroomsController.getMembers);
 classroomsRouter.post("/add_with_email", classroomsController.addParticipantWithEmail);
+classroomsRouter.delete("/remove_participant", classroomsController.removeParticipant);
 
 export default classroomsRouter;
