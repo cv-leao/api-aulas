@@ -6,6 +6,7 @@ import PromoteAParticipantToAdminService from "../services/PromoteAParticipantTo
 import ShowUserClassroomsService from "../services/ShowUserClassroomsService";
 import GetClassroomMembers from "../services/GetClassroomMembers";
 import AddMembersByEmail from "../services/AddMembersByEmail";
+import RemoveParticipant from "../services/RemoveParticipant";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -92,6 +93,21 @@ export default class ClassroomsController {
         const getClassroomMembers = new GetClassroomMembers();
 
         const members = await getClassroomMembers.execute({ user_id, code }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
+
+        return response.json(members);
+    }
+
+    public async removeParticipant(request: Request, response: Response): Promise<Response> {
+        const { token, code, participant_id } = await request.body;
+
+        const user_id = await getIdOnToken(token);
+
+        const removeParticipant = new RemoveParticipant();
+
+        const members = await removeParticipant.execute({ user_id, code, participant_id }).catch(error => {
             response.statusCode = 400;
             return error;
         });
