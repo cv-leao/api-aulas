@@ -11,19 +11,21 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  name             String
-  email            String
-  level            String
-  password         String
-  active           Boolean         @default(false)
-  token            String?         @unique
-  classrooms       ClassroomUser[]
-  mattersId        String?         @db.ObjectId
-  subject_teachers Matters?        @relation(name: "subject_teachers", fields: [mattersId], references: [id])
-  participant      ClassroomUser[] @relation(name: "participant")
-  administrator    ClassroomUser[] @relation(name: "administrator")
-  teacher          ClassroomUser[] @relation(name: "teacher")
+  id                String          @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  email             String
+  level             String
+  password          String
+  active            Boolean         @default(false)
+  token             String?         @unique
+  classrooms        ClassroomUser[]
+  mattersId         String?         @db.ObjectId
+  subject_teachers  Matters?        @relation(name: "subject_teachers", fields: [mattersId], references: [id])
+  participant       ClassroomUser[] @relation(name: "participant")
+  administrator     ClassroomUser[] @relation(name: "administrator")
+  teacher           ClassroomUser[] @relation(name: "teacher")
+  absentTeacher     Dates[]         @relation(name: "absentTeacher")
+  substituteTeacher Dates[]         @relation(name: "substituteTeacher")
 
   @@map("user")
 }
@@ -35,6 +37,7 @@ model Classroom {
   active_room   Boolean         @default(true)
   matters       Matters[]       @relation(name: "matters")
   ClassroomUser ClassroomUser[]
+  Dates         Dates[]
 
   @@map("classroom")
 }
@@ -53,6 +56,20 @@ model ClassroomUser {
   classroom       Classroom? @relation(fields: [classroomId], references: [id])
 
   @@map("classroom_user")
+}
+
+model Dates {
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
+  status              String
+  description         String
+  absentTeacherId     String    @db.ObjectId
+  absentTeacher       User      @relation(name: "absentTeacher", fields: [absentTeacherId], references: [id])
+  substituteTeacherId String?   @db.ObjectId
+  substituteTeacher   User?     @relation(name: "substituteTeacher", fields: [substituteTeacherId], references: [id])
+  classroomId         String    @db.ObjectId
+  classroom           Classroom @relation(fields: [classroomId], references: [id])
+
+  @@map("dates")
 }
 
 model Matters {
