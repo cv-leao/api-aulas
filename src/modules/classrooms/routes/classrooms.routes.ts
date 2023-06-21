@@ -12,4 +12,6 @@ classroomsRouter.get("/get_members", classroomsController.getMembers);
 classroomsRouter.post("/add_with_email", classroomsController.addParticipantWithEmail);
 classroomsRouter.delete("/remove_participant", classroomsController.removeParticipant);
 
+classroomsRouter.post("/create_date", classroomsController.registerVacantHours);
+
 export default classroomsRouter;
