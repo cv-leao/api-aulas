@@ -83,20 +83,22 @@ class RegisterVacantHours {
             throw new AppError("Você precisa ser administrador ou professor da turma para remover participantes.");
         }
 
-        const dateTeste = new Date();
-
-        const registrationDate = utcToZonedTime(dateTeste, "America/Sao_Paulo");
+        const dateParts = date.split('/');
+        const year = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]) - 1;
+        const day = parseInt(dateParts[2]);
+        const convertedDate = new Date(year, month, day);
 
         const dateCreated = await prisma.dates.create({
             data: {
-                date: registrationDate,
+                date: convertedDate,
                 status: "Disponível",
                 description: description,
                 absentTeacher: {
                     connect: { id: user.id },
                 },
                 classroom: {
-                    connect: { id: user.id },
+                    connect: { id: classroom.id },
                 },
             },
         });

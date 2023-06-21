@@ -60,7 +60,7 @@ model ClassroomUser {
 
 model Dates {
   id                  String    @id @default(auto()) @map("_id") @db.ObjectId
-  date                DateTime
+  date                DateTime  @db.Date
   status              String
   description         String
   absentTeacherId     String    @db.ObjectId
