@@ -24,7 +24,7 @@ model User {
   participant       ClassroomUser[] @relation(name: "participant")
   administrator     ClassroomUser[] @relation(name: "administrator")
   teacher           ClassroomUser[] @relation(name: "teacher")
-  absentTeacher     Dates[]         @relation(name: "absentTeacher")
+  dateCreatedBy     Dates[]         @relation(name: "dateCreatedBy")
   substituteTeacher Dates[]         @relation(name: "substituteTeacher")
 
   @@map("user")
@@ -63,8 +63,8 @@ model Dates {
   date                DateTime  @db.Date
   status              String
   description         String
-  absentTeacherId     String    @db.ObjectId
-  absentTeacher       User      @relation(name: "absentTeacher", fields: [absentTeacherId], references: [id])
+  dateCreatedById     String    @db.ObjectId
+  dateCreatedBy       User      @relation(name: "dateCreatedBy", fields: [dateCreatedById], references: [id])
   substituteTeacherId String?   @db.ObjectId
   substituteTeacher   User?     @relation(name: "substituteTeacher", fields: [substituteTeacherId], references: [id])
   classroomId         String    @db.ObjectId
