@@ -1,7 +1,8 @@
-import { utcToZonedTime } from "date-fns-tz";
 import { prisma } from "../../../database/prismaClient";
 import AppError from "../../../shared/errors/AppError";
 import { Dates } from "@prisma/client";
+import { isAfter, isValid, parse, startOfDay } from "date-fns";
+import isValidDate from "../../../utils/IsValidDate";
 
 interface IRequest {
     user_id: string,
@@ -12,9 +13,10 @@ interface IRequest {
 
 class RegisterVacantHours {
     public async execute({ user_id, code, date, description }: IRequest): Promise<Dates> {
-        const user = await prisma.user.findUnique({
+        const user = await prisma.user.findFirst({
             where: {
                 id: user_id,
+                active: true,
             },
         });
 
@@ -30,6 +32,10 @@ class RegisterVacantHours {
 
         if(!classroom) {
             throw new AppError("Sala de aula não encontrada.");
+        }
+
+        if(classroom.active_room === false) {
+            throw new AppError("A sala de aula está desativada.");
         }
 
         const userInClassroom = await prisma.classroomUser.findFirst({
@@ -87,14 +93,29 @@ class RegisterVacantHours {
         const year = parseInt(dateParts[0]);
         const month = parseInt(dateParts[1]) - 1;
         const day = parseInt(dateParts[2]);
+
+        const isValid = await isValidDate(year, month, day);
+
+        if(!isValid) {
+            throw new AppError("Data inválida.");
+        }
+
         const convertedDate = new Date(year, month, day);
+
+        const currentDate = startOfDay(new Date());
+
+        const isDateValid = isAfter(convertedDate, currentDate) || convertedDate.getTime() === currentDate.getTime();
+
+        if(!isDateValid) {
+            throw new AppError("Data inválida!");
+        }
 
         const dateCreated = await prisma.dates.create({
             data: {
                 date: convertedDate,
                 status: "Disponível",
                 description: description,
-                absentTeacher: {
+                dateCreatedBy: {
                     connect: { id: user.id },
                 },
                 classroom: {
