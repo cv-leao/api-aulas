@@ -8,6 +8,7 @@ import GetClassroomMembers from "../services/GetClassroomMembers";
 import AddMembersByEmail from "../services/AddMembersByEmail";
 import RemoveParticipant from "../services/RemoveParticipant";
 import RegisterVacantHours from "../services/RegisterVacantHours";
+import GetClassroomDates from "../services/GetClassroomDates";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -129,5 +130,20 @@ export default class ClassroomsController {
         });
 
         return response.json(dateCreated);
+    }
+
+    public async getDates(request: Request, response: Response): Promise<Response> {
+        const { token, code } = await request.body;
+        
+        const user_id = await getIdOnToken(token);
+
+        const getClassroomDates = new GetClassroomDates();
+
+        const dates = await getClassroomDates.execute({ user_id, code }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
+
+        return response.json(dates);
     }
 }
