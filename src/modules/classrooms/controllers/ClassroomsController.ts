@@ -11,6 +11,7 @@ import RegisterVacantHours from "../services/RegisterVacantHours";
 import GetClassroomDates from "../services/GetClassroomDates";
 import SeeTheVacantClassesThatIRegisteredMyself from "../services/SeeTheVacantClassesThatIRegisteredMyself";
 import AgreedToTeachTheClass from "../services/AgreedToTeachTheClass";
+import TakeTheClass from "../services/TakeTheClass";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -177,5 +178,20 @@ export default class ClassroomsController {
         });
 
         return response.json(dates);
+    }
+
+    public async takeTheClass(request: Request, response: Response): Promise<Response> {
+        const { token, code, date_id } = await request.body;
+
+        const user_id = await getIdOnToken(token);
+
+        const takeTheClass = new TakeTheClass();
+
+        const date = await takeTheClass.execute({ user_id, code, date_id }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
+
+        return response.json(date);
     }
 }
