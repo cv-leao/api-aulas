@@ -1,7 +1,7 @@
 import { Dates } from "@prisma/client";
 import { prisma } from "../../../database/prismaClient";
 import AppError from "../../../shared/errors/AppError";
-import { getDate } from "date-fns";
+import { getDate, startOfDay } from "date-fns";
 
 interface IRequest {
     user_id: string;
@@ -82,8 +82,9 @@ class SeeTheVacantClassesThatIRegisteredMyself {
             throw new AppError("Você precisa ser administrador ou professor da turma para realizar essa ação.");
         }
 
-        const currentDate = new Date();
-        currentDate.setDate(getDate(new Date()));
+        const currentDate = startOfDay(new Date());
+
+        console.log(currentDate);
 
         const dates = await prisma.dates.findMany({
             where: {
