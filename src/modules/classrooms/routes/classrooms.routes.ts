@@ -14,5 +14,6 @@ classroomsRouter.delete("/remove_participant", classroomsController.removePartic
 
 classroomsRouter.post("/create_date", classroomsController.registerVacantHours);
 classroomsRouter.get("/get_dates", classroomsController.getDates);
+classroomsRouter.get("/my_dates", classroomsController.seeTheVacantClassesThatIRegisteredMyself);
 
 export default classroomsRouter;
