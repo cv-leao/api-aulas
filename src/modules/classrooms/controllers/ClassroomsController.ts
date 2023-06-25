@@ -10,6 +10,7 @@ import RemoveParticipant from "../services/RemoveParticipant";
 import RegisterVacantHours from "../services/RegisterVacantHours";
 import GetClassroomDates from "../services/GetClassroomDates";
 import SeeTheVacantClassesThatIRegisteredMyself from "../services/SeeTheVacantClassesThatIRegisteredMyself";
+import AgreedToTeachTheClass from "../services/AgreedToTeachTheClass";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -156,6 +157,21 @@ export default class ClassroomsController {
         const seeTheVacantClassesThatIRegisteredMyself = new SeeTheVacantClassesThatIRegisteredMyself();
 
         const dates = await seeTheVacantClassesThatIRegisteredMyself.execute({ user_id, code }).catch(error => {
+            response.statusCode = 400;
+            return error;
+        });
+
+        return response.json(dates);
+    }
+
+    public async agreedToTeachTheClass(request: Request, response: Response): Promise<Response> {
+        const { token, code } = await request.body;
+
+        const user_id = await getIdOnToken(token);
+
+        const agreedToTeachTheClass = new AgreedToTeachTheClass();
+
+        const dates = await agreedToTeachTheClass.execute({ user_id, code }).catch(error => {
             response.statusCode = 400;
             return error;
         });
