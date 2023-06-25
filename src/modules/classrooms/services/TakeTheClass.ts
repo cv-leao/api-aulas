@@ -22,6 +22,10 @@ class TakeTheClass {
             throw new AppError("Usuário não encontrado.");
         }
 
+        if(user.level != "Professor") {
+            throw new AppError("Você precisa ser um Professor para realizar esta ação.");
+        }
+
         const classroom = await prisma.classroom.findUnique({
             where: {
                 code: code,
@@ -47,6 +51,10 @@ class TakeTheClass {
 
         if(!dateExists) {
             throw new AppError("A data informada é inválida/inexistente.");
+        }
+
+        if(dateExists.substituteTeacherId != null) {
+            throw new AppError("Já tem uma professor substituto para a data selecionada.");
         }
 
         const date = await prisma.dates.update({
