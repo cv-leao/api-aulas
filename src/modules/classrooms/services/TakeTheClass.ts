@@ -57,6 +57,10 @@ class TakeTheClass {
             throw new AppError("Já tem um professor substituto para a data selecionada.");
         }
 
+        if(dateExists.dateCreatedById === user.id) {
+            throw new AppError("Você não pode substituir sua própria aula.");
+        }
+
         const date = await prisma.dates.update({
             where: {
                 id: date_id,
