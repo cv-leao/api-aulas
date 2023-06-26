@@ -38,8 +38,6 @@ class TakeTheClass {
 
         const currentDate = startOfDay(new Date());
 
-        console.log(currentDate);
-
         const dateExists = await prisma.dates.findFirst({
             where: {
                 id: date_id,
