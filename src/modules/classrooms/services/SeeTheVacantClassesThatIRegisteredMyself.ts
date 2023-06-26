@@ -84,8 +84,6 @@ class SeeTheVacantClassesThatIRegisteredMyself {
 
         const currentDate = startOfDay(new Date());
 
-        console.log(currentDate);
-
         const dates = await prisma.dates.findMany({
             where: {
                 dateCreatedBy: {
