@@ -54,7 +54,7 @@ class TakeTheClass {
         }
 
         if(dateExists.substituteTeacherId != null) {
-            throw new AppError("Já tem uma professor substituto para a data selecionada.");
+            throw new AppError("Já tem um professor substituto para a data selecionada.");
         }
 
         const date = await prisma.dates.update({
