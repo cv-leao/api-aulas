@@ -16,7 +16,12 @@ import AppError from "../../../shared/errors/AppError";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
-        const { token, name } = await request.body;
+        const { name } = await request.body;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -32,7 +37,11 @@ export default class ClassroomsController {
 
     public async addParticipantWithCode(request: Request, response: Response): Promise<Response> {
         const { code } = request.params;
-        const { token } = await request.body;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
