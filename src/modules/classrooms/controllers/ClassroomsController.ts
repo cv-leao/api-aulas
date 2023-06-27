@@ -12,6 +12,7 @@ import GetClassroomDates from "../services/GetClassroomDates";
 import SeeTheVacantClassesThatIRegisteredMyself from "../services/SeeTheVacantClassesThatIRegisteredMyself";
 import AgreedToTeachTheClass from "../services/AgreedToTeachTheClass";
 import TakeTheClass from "../services/TakeTheClass";
+import AppError from "../../../shared/errors/AppError";
 
 export default class ClassroomsController {
     public async create(request: Request, response: Response): Promise<Response> {
@@ -76,7 +77,11 @@ export default class ClassroomsController {
     }
 
     public async showUserClassrooms(request: Request, response: Response): Promise<Response> {
-        const { token } = await request.body;
+        const token = request.headers.authorization;
+
+        if (!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -91,7 +96,12 @@ export default class ClassroomsController {
     }
 
     public async getMembers(request: Request, response: Response): Promise<Response> {
-        const { token, code } = await request.body;
+        const { code } = request.params;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -136,7 +146,12 @@ export default class ClassroomsController {
     }
 
     public async getDates(request: Request, response: Response): Promise<Response> {
-        const { token, code } = await request.body;
+        const { code } = request.params;
+        const token = request.headers.authorization;
+        
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
         
         const user_id = await getIdOnToken(token);
 
@@ -151,7 +166,12 @@ export default class ClassroomsController {
     }
 
     public async seeTheVacantClassesThatIRegisteredMyself(request: Request, response: Response): Promise<Response> {
-        const { token, code } = await request.body;
+        const { code } = request.params;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -166,7 +186,12 @@ export default class ClassroomsController {
     }
 
     public async agreedToTeachTheClass(request: Request, response: Response): Promise<Response> {
-        const { token, code } = await request.body;
+        const { code } = request.params;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 

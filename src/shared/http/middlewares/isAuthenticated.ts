@@ -13,7 +13,7 @@ export default function isAuthenticated(
     response: Response,
     next: NextFunction,
 ): void {
-    const { token } = request.body;
+    const token = request.headers.authorization;
 
     if (!token) {
         throw new AppError("O token está ausente.");
