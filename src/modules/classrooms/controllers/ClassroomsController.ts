@@ -56,7 +56,12 @@ export default class ClassroomsController {
     }
 
     public async addParticipantWithEmail(request: Request, response: Response): Promise<Response> {
-        const { token, code, participant_email } = await request.body;
+        const { code, participant_email } = await request.body;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -71,7 +76,12 @@ export default class ClassroomsController {
     }
 
     public async promoteAParticipantToAdmin(request: Request, response: Response): Promise<Response> {
-        const { participant_id, classroom_code, token } = await request.body;
+        const { participant_id, classroom_code } = await request.body;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -125,7 +135,12 @@ export default class ClassroomsController {
     }
 
     public async removeParticipant(request: Request, response: Response): Promise<Response> {
-        const { token, code, participant_id } = await request.body;
+        const { code, participant_id } = await request.body;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -140,7 +155,12 @@ export default class ClassroomsController {
     }
 
     public async registerVacantHours(request: Request, response: Response): Promise<Response> {
-        const { token, code, date, description } = await request.body;
+        const { code, date, description } = await request.body;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
@@ -215,7 +235,12 @@ export default class ClassroomsController {
     }
 
     public async takeTheClass(request: Request, response: Response): Promise<Response> {
-        const { token, code, date_id } = await request.body;
+        const { code, date_id } = await request.body;
+        const token = request.headers.authorization;
+
+        if(!token) {
+            throw new AppError("Token ausente.");
+        }
 
         const user_id = await getIdOnToken(token);
 
